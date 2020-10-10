@@ -1,5 +1,6 @@
 package com.example.socialsnap
 
+import android.graphics.Bitmap
 import com.example.socialsnap.ui.dateToString
 import com.example.socialsnap.ui.stringToDate
 import java.util.*
@@ -11,17 +12,20 @@ class SnapItem {
     var description : String? = null
     var date : String?   = null
     var userId : String? = null
+    var bitmap : Bitmap? = null
 
     constructor(
         filePath : String?,
         description : String?,
         date : String?,
-        userId : String?
+        userId : String?,
+        bitmap : Bitmap?
     ){
         this.filePath = filePath
         this.description = description
         this.date = date
         this.userId = userId
+        this.bitmap = bitmap
     }
 
     fun toHashMap() : HashMap<String, Any?>{
@@ -35,17 +39,14 @@ class SnapItem {
         return hashMap
     }
 
-    companion object {
+    /*fun fromHashMap(hashMap : HashMap<String?, Any?>) : SnapItem {
 
-        fun fromHashMap(hashMap : HashMap<String?, Any?>) : SnapItem {
-
-            val item = SnapItem(
-                hashMap["filepath"].toString(),
-                hashMap["description"].toString(),
-                hashMap["date"].toString(),
-                hashMap["userId"].toString()
-            )
-            return item
-        }
-    }
+        val item = SnapItem(
+            hashMap["filepath"].toString(),
+            hashMap["description"].toString(),
+            hashMap["date"].toString(),
+            hashMap["userId"].toString()
+        )
+        return item
+    }*/
 }
