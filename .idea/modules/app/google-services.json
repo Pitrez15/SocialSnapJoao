@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1096610495058",
+    "firebase_url": "https://socialsnappitrez-c1943.firebaseio.com",
+    "project_id": "socialsnappitrez-c1943",
+    "storage_bucket": "socialsnappitrez-c1943.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096610495058:android:eb616b257599788d48fd8b",
+        "android_client_info": {
+          "package_name": "com.example.socialsnap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096610495058-dsec98oveqid0m7808h3jb4hhlmoovvl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.socialsnap",
+            "certificate_hash": "fa1098345bb216d6e9ce6c698872868fa2b5b402"
+          }
+        },
+        {
+          "client_id": "1096610495058-l9uvfpqchvfu4snhu5q3ivhqsm4jl53p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb5DR-TPyaL3pIBAjySEoJ8PZXjzr1rIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096610495058-l9uvfpqchvfu4snhu5q3ivhqsm4jl53p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
