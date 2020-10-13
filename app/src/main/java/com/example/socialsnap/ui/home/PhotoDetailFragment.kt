@@ -1,12 +1,12 @@
-package com.example.socialsnap
+package com.example.socialsnap.ui.home
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -14,27 +14,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.socialsnap.ui.dateToString
-import com.example.socialsnap.ui.saveImageToCard
+import com.example.socialsnap.R
+import com.example.socialsnap.models.SnapItem
+import com.example.socialsnap.helpers.dateToString
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.android.synthetic.main.activity_photo_detail.*
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.nio.file.spi.FileSystemProvider
 import java.util.*
 
 class PhotoDetailFragment : Fragment() {
-
-    val REQUEST_PERM_WRITE_STORAGE = 102
-    private val CAPTURE_PHOTO = 104
-    internal var imagePath: String? = ""
-
 
     private var bitmap : Bitmap? = null
     var curFile: Uri? = null
@@ -42,10 +38,8 @@ class PhotoDetailFragment : Fragment() {
 
     private val auth: FirebaseAuth = Firebase.auth
     private val db = Firebase.firestore
-    private val storage = Firebase.storage
     private val currentUser = auth.currentUser
-    private val imageRef = Firebase.storage.reference
-
+    private val storageRef = Firebase.storage.reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,19 +74,35 @@ class PhotoDetailFragment : Fragment() {
 
         buttonUploadPhoto.setOnClickListener {
 
-            var filename = editTextDescription.text.toString()
+            val imagesRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
 
-            imageRef.child("images/$filename").putFile(curFile!!)
+            val baos = ByteArrayOutputStream()
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+            val data = baos.toByteArray()
 
-            val snap = SnapItem("gs://socialsnappitrez-c1943.appspot.com/images/$filename", editTextDescription.text.toString(), date, currentUser!!.uid, null)
+            val uploadTask = imagesRef.putBytes(data)
 
-            db.collection("snaps").add(snap.toHashMap()).addOnSuccessListener {
+            uploadTask.addOnFailureListener {
+                // Handle unsuccessful uploads
 
-                    requireActivity().supportFragmentManager.popBackStack()
+            }.addOnSuccessListener { taskSnapshot ->
 
-            }.addOnFailureListener {
+                val snap = SnapItem(
+                    imagesRef.name,
+                    editTextDescription.text.toString(),
+                    date,
+                    currentUser!!.uid
+                )
 
-                Toast.makeText(requireContext(), "Something Wrong!", Toast.LENGTH_SHORT).show()
+                db.collection("snaps")
+                    .add(snap.toHashMap())
+                    .addOnSuccessListener {
+                        requireActivity().supportFragmentManager.popBackStack()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(), "Algo correu mal!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
             }
         }
     }
@@ -107,44 +117,19 @@ class PhotoDetailFragment : Fragment() {
                 data?.extras?.let {
 
                     bitmap = it.get("data") as Bitmap
-                    saveImage(bitmap!!)
-                    imageViewPhoto.setImageBitmap(bitmap!!)
+                    imageViewPhoto.setImageBitmap(bitmap)
                 }
             }
             else if (requestCode == REQUEST_CODE_IMAGE_PICK) {
 
                 data?.data?.let {
+
                     curFile = it
                     imageViewPhoto.setImageURI(it)
+
+                    bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, it)
                 }
             }
-        }
-    }
-
-    private fun saveImage(finalBitmap: Bitmap) {
-
-        val root = Environment.getExternalStorageDirectory().toString()
-        val myDir = File(root + "/capture_photo")
-        myDir.mkdirs()
-        val generator = Random()
-        var n = 10000
-        n = generator.nextInt(n)
-        val OutletFname = "Image-$n.jpg"
-        val file = File(myDir, OutletFname)
-
-        if (file.exists()) file.delete()
-
-        try {
-
-            val out = FileOutputStream(file)
-            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
-            imagePath = file.absolutePath
-            out.flush()
-            out.close()
-        }
-        catch (e: Exception) {
-
-            e.printStackTrace()
         }
     }
 

@@ -28,7 +28,7 @@
         tools:layout="@layout/fragment_notifications" />
     <fragment
         android:id="@+id/photoDetailFragment"
-        android:name="com.example.socialsnap.PhotoDetailFragment"
+        android:name="com.example.socialsnap.ui.home.PhotoDetailFragment"
         android:label="activity_photo_detail"
         tools:layout="@layout/activity_photo_detail" />
 </navigation>

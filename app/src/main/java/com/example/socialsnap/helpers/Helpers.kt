@@ -1,8 +1,7 @@
-package com.example.socialsnap.ui
+package com.example.socialsnap.helpers
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import java.io.File
@@ -10,8 +9,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 fun dateToString (date : Date) : String{
