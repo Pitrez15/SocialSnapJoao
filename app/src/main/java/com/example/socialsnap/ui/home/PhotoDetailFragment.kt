@@ -91,7 +91,7 @@ class PhotoDetailFragment : Fragment() {
                     imagesRef.name,
                     editTextDescription.text.toString(),
                     date,
-                    currentUser!!.uid
+                    currentUser!!.email
                 )
 
                 db.collection("snaps")
