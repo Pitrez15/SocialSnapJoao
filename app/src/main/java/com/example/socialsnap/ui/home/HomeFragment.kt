@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
 
         fabNewPhoto.setOnClickListener {
 
-            val action = HomeFragmentDirections.actionNavigationHomeToPhotoDetailFragment()
+            val action = HomeFragmentDirections.actionNavigationHomeToPhotoDetailFragment(null)
             it.findNavController().navigate(action)
         }
 
@@ -63,7 +63,7 @@ class HomeFragment : Fragment() {
 
         val db = FirebaseFirestore.getInstance()
 
-        db.collection("snaps")
+        db.collection("snaps").orderBy("date")
             .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
 
                 snaps.clear()
@@ -72,7 +72,9 @@ class HomeFragment : Fragment() {
 
                     for(d in querySnapshot){
 
-                        snaps.add(SnapItem.fromHashMap(d.data as HashMap<String, Any?>))
+                        val snap = SnapItem.fromHashMap(d.data as HashMap<String, Any?>)
+                        snap.itemId = d.id
+                        snaps.add(snap)
                     }
                 }
 
@@ -106,6 +108,12 @@ class HomeFragment : Fragment() {
                 imageViewSnap.setImageBitmap(BitmapFactory.decodeStream(bais))
             }.addOnFailureListener {
                 // Handle any errors
+            }
+
+            rowView.setOnClickListener {
+
+                val action =  HomeFragmentDirections.actionNavigationHomeToPhotoDetailFragment(snaps[position].itemId)
+                it.findNavController().navigate(action)
             }
 
             return rowView

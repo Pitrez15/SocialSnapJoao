@@ -10,6 +10,7 @@ class SnapItem {
     var description : String? = null
     var date : String?   = null
     var userId : String? = null
+    var itemId : String? = null
 
     constructor(
         filePath : String?,

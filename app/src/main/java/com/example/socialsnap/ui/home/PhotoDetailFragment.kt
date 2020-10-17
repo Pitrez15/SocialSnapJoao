@@ -15,6 +15,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.socialsnap.R
 import com.example.socialsnap.models.SnapItem
 import com.example.socialsnap.helpers.dateToString
@@ -25,6 +28,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.android.synthetic.main.activity_photo_detail.*
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -35,6 +39,9 @@ class PhotoDetailFragment : Fragment() {
     private var bitmap : Bitmap? = null
     var curFile: Uri? = null
     private var date : String? = dateToString(Date())
+    val args : PhotoDetailFragmentArgs by navArgs()
+    var snapItemId : String? = null
+    var snapItem: SnapItem? = null
 
     private val auth: FirebaseAuth = Firebase.auth
     private val db = Firebase.firestore
@@ -43,7 +50,6 @@ class PhotoDetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -56,6 +62,47 @@ class PhotoDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        snapItemId = args.snapItemId
+
+        snapItemId?.let {
+
+            db.collection("snaps").document(it)
+                .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+
+                    if (querySnapshot != null) {
+
+                        snapItem = SnapItem.fromHashMap(querySnapshot.data as HashMap<String, Any?>)
+                        snapItem?.itemId = querySnapshot.id
+                        editTextDescription.setText(snapItem?.description)
+
+                        val imagesRef = storageRef.child("images/${snapItem?.filePath}")
+
+                        val ONE_MEGABYTE: Long = 1024 * 1024
+
+                        imagesRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+
+                            val bais = ByteArrayInputStream(it)
+                            this.imageViewPhoto.setImageBitmap(BitmapFactory.decodeStream(bais))
+                        }.addOnFailureListener {
+
+                        }
+                        fabPhoto.visibility = View.GONE
+                        buttonSelectPhoto.visibility = View.GONE
+
+                        val userId = FirebaseAuth.getInstance().currentUser?.email
+
+                        if (userId.equals(snapItem?.userId)){
+
+                            buttonUploadPhoto.text = "Update"
+                        }
+                        else {
+
+                            buttonUploadPhoto.visibility = View.GONE
+                        }
+                    }
+                }
+        }
 
         fabPhoto.setOnClickListener {
 
@@ -74,35 +121,57 @@ class PhotoDetailFragment : Fragment() {
 
         buttonUploadPhoto.setOnClickListener {
 
-            val imagesRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+            snapItem?.let {
 
-            val baos = ByteArrayOutputStream()
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-            val data = baos.toByteArray()
-
-            val uploadTask = imagesRef.putBytes(data)
-
-            uploadTask.addOnFailureListener {
-                // Handle unsuccessful uploads
-
-            }.addOnSuccessListener { taskSnapshot ->
-
-                val snap = SnapItem(
-                    imagesRef.name,
-                    editTextDescription.text.toString(),
-                    date,
-                    currentUser!!.email
-                )
+                it.description = editTextDescription.text.toString()
 
                 db.collection("snaps")
-                    .add(snap.toHashMap())
+                    .document(it.itemId!!)
+                    .set(it.toHashMap())
                     .addOnSuccessListener {
-                        requireActivity().supportFragmentManager.popBackStack()
+
+                        //findNavController().popBackStack()
+
+                        val action = PhotoDetailFragmentDirections.actionPhotoDetailFragmentToNavigationHome()
+                        findNavController().navigate(action)
                     }
                     .addOnFailureListener {
-                        Toast.makeText(requireContext(), "Algo correu mal!", Toast.LENGTH_SHORT)
-                            .show()
+
+                        Toast.makeText(requireContext(), "Algo correu mal!", Toast.LENGTH_SHORT).show()
                     }
+            }?:run {
+
+                val imagesRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+
+                val baos = ByteArrayOutputStream()
+                bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                val data = baos.toByteArray()
+
+                val uploadTask = imagesRef.putBytes(data)
+
+                uploadTask.addOnFailureListener {
+                    // Handle unsuccessful uploads
+
+                }.addOnSuccessListener { taskSnapshot ->
+
+                    val snap = SnapItem(
+                        imagesRef.name,
+                        editTextDescription.text.toString(),
+                        date,
+                        currentUser!!.email
+                    )
+
+                    db.collection("snaps")
+                        .add(snap.toHashMap())
+                        .addOnSuccessListener {
+
+                            val action = PhotoDetailFragmentDirections.actionPhotoDetailFragmentToNavigationHome()
+                            findNavController().navigate(action)
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(requireContext(), "Algo correu mal!", Toast.LENGTH_SHORT).show()
+                        }
+                }
             }
         }
     }

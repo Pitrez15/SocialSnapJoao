@@ -1,7 +1,9 @@
 package com.example.socialsnap.ui.login
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +15,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.CoroutineScope
@@ -49,8 +52,7 @@ class LoginActivity : AppCompatActivity() {
 
             auth.signInWithEmailAndPassword(
                 editTextLoginUsername.text.toString(),
-                editTextLoginPassword.text.toString()
-            ).addOnCompleteListener(this) { task ->
+                editTextLoginPassword.text.toString()).addOnCompleteListener(this) { task ->
 
                     if (task.isSuccessful) {
 
@@ -59,6 +61,32 @@ class LoginActivity : AppCompatActivity() {
 
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
+
+                        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+                        val token = sharedPreferences.getString("firebase_token","")
+
+                        if ((token?:"").isNotEmpty()){
+
+                            val auth = Firebase.auth
+                            val currentUser = auth.currentUser
+                            val db = FirebaseFirestore.getInstance()
+
+                            val hashMap = HashMap<String, Any?>()
+                            hashMap["token"] = token
+                            hashMap["email"] = currentUser?.email
+
+                            currentUser?.let {
+
+                                db.collection("users").document(currentUser?.uid?:"")
+                                    .set(hashMap)
+                                    .addOnSuccessListener {
+
+                                    }
+                                    .addOnFailureListener {
+
+                                    }
+                            }
+                        }
                     }
                     else {
 

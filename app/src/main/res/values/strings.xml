@@ -4,4 +4,6 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="webclient_id">1096610495058-l9uvfpqchvfu4snhu5q3ivhqsm4jl53p.apps.googleusercontent.com</string>
+    <string name="default_notification_channel_id">Social Snap</string>
+    <string name="fcm_message">Social Snap</string>
 </resources>
