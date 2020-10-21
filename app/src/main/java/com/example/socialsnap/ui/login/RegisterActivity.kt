@@ -102,11 +102,11 @@ class RegisterActivity : AppCompatActivity() {
 
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val db = FirebaseFirestore.getInstance()
-        val ref = db.collection("users_chat")
+        val ref = db.collection("users_chat").document(FirebaseAuth.getInstance().uid ?: "")
 
-        val user = User(uid, editTextRegisterUsername.text.toString(), profileImageUrl)
+        val user = User(uid, editTextRegisterUsername.text.toString(), profileImageUrl, editTextRegisterEmail.text.toString(), "")
 
-        ref.add(user)
+        ref.set(user)
             .addOnSuccessListener {
 
         }

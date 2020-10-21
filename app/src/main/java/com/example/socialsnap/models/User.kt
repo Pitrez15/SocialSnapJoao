@@ -1,17 +1,15 @@
 package com.example.socialsnap.models
 
-class User {
-    var uid : String? = null
-    var username : String? = null
-    var profileImageUrl : String? = null
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-    constructor(
-        uid : String?,
-        username : String?,
-        profileImageUrl : String?
-    ){
-        this.uid = uid
-        this.username = username
-        this.profileImageUrl = profileImageUrl
-    }
+@Parcelize
+class User (
+    var uid : String? = null,
+    var username : String? = null,
+    var profileImageUrl : String? = null,
+    var email : String? = null,
+    var token : String? = null): Parcelable {
+
+    constructor() : this("", "", "", "", "")
 }

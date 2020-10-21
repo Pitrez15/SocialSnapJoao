@@ -4,6 +4,10 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
+androidExtensions {
+    experimental = true
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"

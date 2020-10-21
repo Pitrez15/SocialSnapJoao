@@ -73,12 +73,11 @@ class LoginActivity : AppCompatActivity() {
 
                             val hashMap = HashMap<String, Any?>()
                             hashMap["token"] = token
-                            hashMap["email"] = currentUser?.email
 
                             currentUser?.let {
 
-                                db.collection("users").document(currentUser?.uid?:"")
-                                    .set(hashMap)
+                                db.collection("users_chat").document(currentUser.uid?:"")
+                                    .update(hashMap)
                                     .addOnSuccessListener {
 
                                     }

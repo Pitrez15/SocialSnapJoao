@@ -1,5 +1,6 @@
 package com.example.socialsnap.ui.home
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.socialsnap.R
@@ -31,6 +32,11 @@ class NewMessageActivity : AppCompatActivity() {
         fetchUsers()
     }
 
+    companion object {
+
+        val USER_KEY = "USER_KEY"
+    }
+
     private fun fetchUsers() {
 
         val db = FirebaseFirestore.getInstance()
@@ -54,6 +60,19 @@ class NewMessageActivity : AppCompatActivity() {
                     adapter.add(UserItem(user!!))
                 }
             }
+
+            adapter.setOnItemClickListener { item, view ->
+
+                val userItem = item as UserItem
+
+                val intent = Intent(view.context, ChatLogActivity::class.java)
+                //intent.putExtra(USER_KEY, userItem.user.username)
+                intent.putExtra(USER_KEY, userItem.user)
+                startActivity(intent)
+
+                finish()
+            }
+
             recyclerViewNewMessage.adapter = adapter
         }
 
@@ -82,7 +101,7 @@ class NewMessageActivity : AppCompatActivity() {
     }
 }
 
-class UserItem(private val user : User) : Item<GroupieViewHolder>() {
+class UserItem(val user : User) : Item<GroupieViewHolder>() {
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
