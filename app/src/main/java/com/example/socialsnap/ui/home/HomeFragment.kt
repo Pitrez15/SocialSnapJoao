@@ -18,6 +18,7 @@ import com.example.socialsnap.models.SnapItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -63,7 +64,7 @@ class HomeFragment : Fragment() {
 
         val db = FirebaseFirestore.getInstance()
 
-        db.collection("snaps").orderBy("date")
+        db.collection("snaps").orderBy("date", Query.Direction.DESCENDING)
             .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
 
                 snaps.clear()

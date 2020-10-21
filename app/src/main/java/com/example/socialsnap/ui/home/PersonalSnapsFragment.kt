@@ -1,4 +1,4 @@
-package com.example.socialsnap.ui.dashboard
+package com.example.socialsnap.ui.home
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -19,7 +19,7 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import java.io.ByteArrayInputStream
 
-class DashboardFragment : Fragment() {
+class PersonalSnapsFragment : Fragment() {
 
     var snaps : MutableList<SnapItem> = ArrayList<SnapItem>()
     var userSnapAdapter : UserSnapAdapter? = null

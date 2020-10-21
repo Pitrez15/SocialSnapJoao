@@ -17,15 +17,15 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.socialsnap.ui.dashboard.DashboardFragment"
+        android:name="com.example.socialsnap.ui.home.PersonalSnapsFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.socialsnap.ui.notifications.NotificationsFragment"
+        android:name="com.example.socialsnap.ui.home.ChatFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_chat" />
     <fragment
         android:id="@+id/photoDetailFragment"
         android:name="com.example.socialsnap.ui.home.PhotoDetailFragment"

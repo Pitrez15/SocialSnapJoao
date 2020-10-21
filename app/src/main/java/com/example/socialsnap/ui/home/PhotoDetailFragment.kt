@@ -74,11 +74,9 @@ class PhotoDetailFragment : Fragment() {
 
                         snapItem = SnapItem.fromHashMap(querySnapshot.data as HashMap<String, Any?>)
                         snapItem?.itemId = querySnapshot.id
-                        editTextDescription.setText(snapItem?.description)
+                        editTextDescription.setText(snapItem?.description?:"")
 
                         val imagesRef = storageRef.child("images/${snapItem?.filePath}")
-
-                        val ONE_MEGABYTE: Long = 1024 * 1024
 
                         imagesRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
 
@@ -206,5 +204,6 @@ class PhotoDetailFragment : Fragment() {
 
         const val REQUEST_CODE_PHOTO = 23524
         const val REQUEST_CODE_IMAGE_PICK = 0
+        const val ONE_MEGABYTE : Long = 1024 * 1024 * 5
     }
 }
