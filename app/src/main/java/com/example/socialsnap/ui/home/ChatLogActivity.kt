@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -30,12 +31,14 @@ class ChatLogActivity : AppCompatActivity() {
     var message : ChatMessage? = null
     val adapter = GroupAdapter<GroupieViewHolder>()
 
+    var toUser : User? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
 
-        val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-        supportActionBar?.title = user.username
+        toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+        supportActionBar?.title = toUser?.username
 
         recyclerViewChatLog.adapter = adapter
 
@@ -49,7 +52,10 @@ class ChatLogActivity : AppCompatActivity() {
 
     private fun listenForMessages() {
 
-        val reference = FirebaseFirestore.getInstance().collection("messages")
+        val fromId = FirebaseAuth.getInstance().uid
+        val toId = toUser?.uid
+
+        val reference = FirebaseFirestore.getInstance().collection("user_messages").document(fromId.toString()).collection(toId.toString()) .orderBy("timeStamp")
 
         reference.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
 
@@ -67,48 +73,19 @@ class ChatLogActivity : AppCompatActivity() {
 
                     if (message!!.fromId == FirebaseAuth.getInstance().uid) {
 
-                        adapter.add(ChatFromItem(message!!.text.toString()))
+                        val currentUser = LatestMessagesActivity.currentUser
+
+                        adapter.add(ChatToItem(message!!.text.toString(), currentUser!!))
                     }
                     else {
 
-                        adapter.add(ChatToItem(message!!.text.toString()))
+                        adapter.add(ChatFromItem(message!!.text.toString(), toUser!!))
                     }
                 }
             }
+            recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
         }
 
-        /*val ref = FirebaseDatabase.getInstance().getReference("/messages")
-
-        ref.addChildEventListener(object : ChildEventListener {
-
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-
-                val chatMessage = snapshot.getValue(ChatMessage::class.java)
-
-                if (chatMessage != null) {
-
-                    Log.d(TAG, chatMessage.text)
-
-                    adapter.add(ChatFromItem(chatMessage.text))
-                }
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })*/
     }
 
     private fun performSendMessage() {
@@ -116,23 +93,32 @@ class ChatLogActivity : AppCompatActivity() {
         val text = editTextTextSendMessage.text.toString()
 
         val fromId = FirebaseAuth.getInstance().uid
-        val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-        val toId = user.uid
+        val toId = toUser?.uid
 
-        val reference = FirebaseFirestore.getInstance().collection("messages")
+        val reference = FirebaseFirestore.getInstance().collection("user_messages").document(fromId.toString()).collection(toId.toString())
+        val toReference = FirebaseFirestore.getInstance().collection("user_messages").document(toId.toString()).collection(fromId.toString())
+
         val chatMessage = ChatMessage(text, fromId!!, toId!!, System.currentTimeMillis() / 1000)
 
         reference.add(chatMessage).addOnSuccessListener {
 
+            editTextTextSendMessage.text.clear()
+            recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
         }
+        toReference.add(chatMessage)
     }
 }
 
-class ChatFromItem (val text : String) : Item<GroupieViewHolder>(){
+class ChatFromItem (val text : String, val user : User) : Item<GroupieViewHolder>(){
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
         viewHolder.itemView.textViewChatFrom.text = text
+
+        val uri = user.profileImageUrl
+        val targetImageView = viewHolder.itemView.imageViewChatFrom
+
+        Picasso.get().load(uri).into(targetImageView)
     }
 
     override fun getLayout(): Int {
@@ -141,11 +127,16 @@ class ChatFromItem (val text : String) : Item<GroupieViewHolder>(){
     }
 }
 
-class ChatToItem (val text : String) : Item<GroupieViewHolder>(){
+class ChatToItem (val text : String, val user : User) : Item<GroupieViewHolder>(){
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
         viewHolder.itemView.textViewChatTo.text = text
+
+        val uri = user.profileImageUrl
+        val targetImageView = viewHolder.itemView.imageViewChatTo
+
+        Picasso.get().load(uri).into(targetImageView)
     }
 
     override fun getLayout(): Int {
