@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.socialsnap.R
 import com.example.socialsnap.models.User
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -15,8 +16,6 @@ import kotlinx.android.synthetic.main.user_row_new_message.view.*
 
 class NewMessageActivity : AppCompatActivity() {
 
-    //var users : MutableList<User> = ArrayList<User>()
-
     var user : User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +23,6 @@ class NewMessageActivity : AppCompatActivity() {
         setContentView(R.layout.activity_new_message)
 
         supportActionBar?.title = "Select User"
-
-        //val adapter = GroupAdapter<GroupieViewHolder>()
-
-        //recyclerViewNewMessage.adapter = adapter
 
         fetchUsers()
     }
@@ -39,6 +34,8 @@ class NewMessageActivity : AppCompatActivity() {
 
     private fun fetchUsers() {
 
+        val fromId = FirebaseAuth.getInstance().uid
+
         val db = FirebaseFirestore.getInstance()
         val ref = db.collection("users_chat")
 
@@ -49,15 +46,14 @@ class NewMessageActivity : AppCompatActivity() {
 
                 for(d in querySnapshot){
 
-                    //users.add(User(d.data.getValue("uid").toString(),
-                                    //d.data.getValue("username").toString(),
-                                    //d.data.getValue("profileImageUrl").toString()))
-
                     user = User(d.data.getValue("uid").toString(),
                                 d.data.getValue("username").toString(),
                                 d.data.getValue("profileImageUrl").toString())
 
-                    adapter.add(UserItem(user!!))
+                    if (user!!.uid != fromId) {
+
+                        adapter.add(UserItem(user!!))
+                    }
                 }
             }
 
@@ -66,7 +62,6 @@ class NewMessageActivity : AppCompatActivity() {
                 val userItem = item as UserItem
 
                 val intent = Intent(view.context, ChatLogActivity::class.java)
-                //intent.putExtra(USER_KEY, userItem.user.username)
                 intent.putExtra(USER_KEY, userItem.user)
                 startActivity(intent)
 
@@ -75,29 +70,6 @@ class NewMessageActivity : AppCompatActivity() {
 
             recyclerViewNewMessage.adapter = adapter
         }
-
-        /*ref.addListenerForSingleValueEvent(object : ValueEventListener {
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                val adapter = GroupAdapter<GroupieViewHolder>()
-
-                snapshot.children.forEach {
-
-                    val user = it.getValue(User::class.java)
-
-                    if (user != null) {
-
-                        adapter.add(UserItem(user))
-                    }
-                }
-                recyclerViewNewMessage.adapter = adapter
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })*/
     }
 }
 

@@ -6,7 +6,7 @@
     android:layout_height="120dp">
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imageViewLatestUser"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="24dp"
@@ -16,7 +16,7 @@
         app:srcCompat="@drawable/ic_baseline_account_box_24" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textViewLatestUsername"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -24,15 +24,15 @@
         android:text="username"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintBottom_toTopOf="@+id/textViewLatestMessage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintStart_toEndOf="@+id/imageViewLatestUser"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textViewLatestMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -45,6 +45,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintStart_toEndOf="@+id/imageViewLatestUser"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLatestUsername" />
 </androidx.constraintlayout.widget.ConstraintLayout>

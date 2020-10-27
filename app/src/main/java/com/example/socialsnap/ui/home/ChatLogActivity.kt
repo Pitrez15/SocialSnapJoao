@@ -55,7 +55,11 @@ class ChatLogActivity : AppCompatActivity() {
         val fromId = FirebaseAuth.getInstance().uid
         val toId = toUser?.uid
 
-        val reference = FirebaseFirestore.getInstance().collection("user_messages").document(fromId.toString()).collection(toId.toString()) .orderBy("timeStamp")
+        val reference = FirebaseFirestore.getInstance()
+                                .collection("user_messages")
+                                .document(fromId.toString())
+                                .collection(toId.toString())
+                                .orderBy("timeStamp")
 
         reference.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
 
@@ -74,7 +78,6 @@ class ChatLogActivity : AppCompatActivity() {
                     if (message!!.fromId == FirebaseAuth.getInstance().uid) {
 
                         val currentUser = LatestMessagesActivity.currentUser
-
                         adapter.add(ChatToItem(message!!.text.toString(), currentUser!!))
                     }
                     else {
@@ -95,8 +98,14 @@ class ChatLogActivity : AppCompatActivity() {
         val fromId = FirebaseAuth.getInstance().uid
         val toId = toUser?.uid
 
-        val reference = FirebaseFirestore.getInstance().collection("user_messages").document(fromId.toString()).collection(toId.toString())
-        val toReference = FirebaseFirestore.getInstance().collection("user_messages").document(toId.toString()).collection(fromId.toString())
+        val reference = FirebaseFirestore.getInstance()
+                                            .collection("user_messages")
+                                            .document(fromId.toString())
+                                            .collection(toId.toString())
+        val toReference = FirebaseFirestore.getInstance()
+                                            .collection("user_messages")
+                                            .document(toId.toString())
+                                            .collection(fromId.toString())
 
         val chatMessage = ChatMessage(text, fromId!!, toId!!, System.currentTimeMillis() / 1000)
 
@@ -106,6 +115,20 @@ class ChatLogActivity : AppCompatActivity() {
             recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
         }
         toReference.add(chatMessage)
+
+        val latestMessageRef = FirebaseFirestore.getInstance()
+                                                .collection("latest_messages")
+                                                .document(fromId.toString())
+                                                .collection("latest_message")
+                                                .document(toId.toString())
+        latestMessageRef.set(chatMessage)
+
+        val latestMessageToRef = FirebaseFirestore.getInstance()
+                                                .collection("latest_messages")
+                                                .document(toId.toString())
+                                                .collection("latest_message")
+                                                .document(fromId.toString())
+        latestMessageToRef.set(chatMessage)
     }
 }
 
