@@ -8,7 +8,8 @@ class ChatMessage (
     val text : String? = null,
     val fromId : String? = null,
     val toId : String? = null,
-    val timeStamp : Long? = null): Parcelable {
+    val timeStamp : Long? = null,
+    val messageType : String? = null): Parcelable {
 
-    constructor() : this("", "", "", -1)
+    constructor() : this("", "", "", -1, "")
 }

@@ -53,8 +53,6 @@ class RegisterActivity : AppCompatActivity() {
 
                     if (task.isSuccessful) {
 
-                        Log.d(TAG, "createUserWithEmail:success")
-
                         uploadImageToFirebaseStorage()
 
                         val intent = Intent(this, LoginActivity::class.java)
@@ -62,7 +60,6 @@ class RegisterActivity : AppCompatActivity() {
                     }
                     else {
 
-                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
                         Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -110,7 +107,7 @@ class RegisterActivity : AppCompatActivity() {
         ref.set(user)
             .addOnSuccessListener {
 
-        }
+            }
             .addOnFailureListener {
 
             }

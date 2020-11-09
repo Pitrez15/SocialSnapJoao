@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
@@ -23,9 +24,9 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.socialsnap.ui.home.ChatFragment"
+        android:name="com.example.socialsnap.ui.home.HomeFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_chat" />
+        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/photoDetailFragment"
         android:name="com.example.socialsnap.ui.home.PhotoDetailFragment"
