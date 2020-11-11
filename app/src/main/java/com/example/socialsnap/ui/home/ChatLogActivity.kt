@@ -18,6 +18,7 @@ import android.os.Handler
 import android.os.SystemClock
 import android.transition.TransitionManager
 import android.util.Log
+import android.webkit.URLUtil
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -42,6 +43,7 @@ import kotlinx.android.synthetic.main.chat_to_voice_row.view.*
 import java.io.File
 import java.io.IOException
 import java.lang.Exception
+import java.net.URL
 import java.util.*
 
 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -60,6 +62,7 @@ class ChatLogActivity : AppCompatActivity() {
     private val RECORD_AUDIO_REQUEST_CODE = 101
     private var audioName : String? = null
     private var audioUri : String? = null
+    private var audioDir : String? = null
 
     var toUser : User? = null
 
@@ -124,7 +127,7 @@ class ChatLogActivity : AppCompatActivity() {
 
         mRecorder = MediaRecorder()
         mRecorder!!.setAudioSource(MediaRecorder.AudioSource.MIC)
-        mRecorder!!.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+        mRecorder!!.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
         mRecorder!!.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
         val root = android.os.Environment.getExternalStorageDirectory()
@@ -136,7 +139,7 @@ class ChatLogActivity : AppCompatActivity() {
         }
 
         audioName = (System.currentTimeMillis().toString() + ".mp3")
-        val audioDir = root.absolutePath + "/AndroidCodility/Audios/" +  audioName
+        audioDir = root.absolutePath + "/AndroidCodility/Audios/" +  audioName
         mRecorder!!.setOutputFile(audioDir)
         audioUri = "content://com.example.socialsnap/files/" + audioName
 
@@ -291,7 +294,7 @@ class ChatLogActivity : AppCompatActivity() {
 
         val file = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/audios/$file")
-        val selectedAudioUri = Uri.parse(audioUri)
+        val selectedAudioUri = Uri.fromFile(File(audioDir!!))
 
         ref.putFile(selectedAudioUri)
             .addOnSuccessListener {
@@ -510,7 +513,15 @@ class ChatFromAudioItem (val text : String, val user : User) : Item<GroupieViewH
 
         buttonPlay.setOnClickListener {
 
-            if (mp == null) {
+            mp = MediaPlayer()
+            mp!!.setDataSource(text)
+            mp!!.setOnPreparedListener { player ->
+                player.start()
+                initializeSeekBar(viewHolder)
+            }
+            mp!!.prepareAsync()
+
+            /*if (mp == null) {
 
                 mp = MediaPlayer().apply {
                     setAudioAttributes(
@@ -524,7 +535,7 @@ class ChatFromAudioItem (val text : String, val user : User) : Item<GroupieViewH
                     initializeSeekBar(viewHolder)
                 }
             }
-            mp?.start()
+            mp?.start()*/
 
             buttonPlay.visibility = View.GONE
             buttonPause.visibility = View.VISIBLE
@@ -601,7 +612,15 @@ class ChatToAudioItem (val text : String, val user : User) : Item<GroupieViewHol
 
         buttonPlay.setOnClickListener {
 
-            if (mp == null) {
+            mp = MediaPlayer()
+            mp!!.setDataSource(text)
+            mp!!.setOnPreparedListener { player ->
+                player.start()
+                initializeSeekBar(viewHolder)
+            }
+            mp!!.prepareAsync()
+
+            /*if (mp == null) {
 
                 mp = MediaPlayer().apply {
                     setAudioAttributes(
@@ -615,9 +634,9 @@ class ChatToAudioItem (val text : String, val user : User) : Item<GroupieViewHol
                     initializeSeekBar(viewHolder)
                 }
             }
-            mp?.start()
+            mp?.start()*/
 
-            buttonPlay.visibility = View.GONE
+            buttonPlay.visibility = View.INVISIBLE
             buttonPause.visibility = View.VISIBLE
         }
 
@@ -628,7 +647,7 @@ class ChatToAudioItem (val text : String, val user : User) : Item<GroupieViewHol
                 mp?.pause()
             }
 
-            buttonPause.visibility = View.GONE
+            buttonPause.visibility = View.INVISIBLE
             buttonPlay.visibility = View.VISIBLE
         }
 
