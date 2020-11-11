@@ -78,7 +78,6 @@ class HomeFragment : Fragment() {
                         snaps.add(snap)
                     }
                 }
-
                 snapAdapter?.notifyDataSetChanged()
             }
     }
